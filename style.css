@@ -47,6 +47,7 @@
   align-items: center;
   font-size: 40px;
   cursor: pointer;
+  color: #18181B;
 }
 
 .hide {
@@ -54,11 +55,13 @@
 }
 
 .playerX {
-  color: #DC2626
+  color: #DC2626;
+  transition: all 0.3s ease-in;
 }
 
 .playerO {
-  color: #0284C7;
+  color: #0284C7;;
+  transition: all 0.3s ease-in;
 }
 
 #reset {
