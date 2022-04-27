@@ -1,0 +1,78 @@
+@import url('https://fonts.googleapis.com/css?family=Press+Start+2P&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  font-family: 'Press Start 2P', sans-serif;
+  box-sizing: border-box;
+}
+
+.background {
+  background-color: #18181B;
+  height: 100vh;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  
+}
+
+.title {
+  font-size: 40px;
+  margin-top: 20px;
+  color: #FAFAFA;
+}
+
+.player-turn {
+  font-size: 15px;
+  margin-top: 20px;
+  color: #FAFAFA;
+}
+
+.game-container {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: 33% 33% 33%;
+  grid-template-rows: 33% 33% 33%;
+  max-width: 300px;
+}
+
+.tile {
+  border: 1px solid #FAFAFA;;
+  min-width: 100px;
+  min-height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 40px;
+  cursor: pointer;
+}
+
+.hide {
+  display: none;
+}
+
+.playerX {
+  color: #DC2626
+}
+
+.playerO {
+  color: #0284C7;
+}
+
+#reset {
+  font-size: 10px;
+  margin-top: 20px;
+  color: #18181B;
+  padding: 10px;
+  border-radius: 5px;
+  border-style: none;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+#reset:hover {
+  transform: scale(1.1);
+  border-radius: 5px;
+}
