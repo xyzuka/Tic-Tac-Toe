@@ -13,16 +13,18 @@ window.addEventListener('DOMContentLoaded', () => {
       [6] [7] [8]
   */
 
-  let isGameActive = true;
-
+  // State management
   /**
    * Contain the state and memory storage of the game
    */
   const gameBoard = {
+    _isGameActive: true,
     _board: ['', '', '', '', '', '', '', '', ''],
     _player1: 'X',
     _player2: 'O',
     _currentPlayer: this._player1,
+    _player1Score: [],
+    _player2Score: [],
     _winningConditions: [
       [0, 1, 2],
       [3, 4, 5],
@@ -35,28 +37,60 @@ window.addEventListener('DOMContentLoaded', () => {
     ],
   };
 
+  const setCurrentPlayer = (() =>
+    (gameBoard._currentPlayer = gameBoard._player1))();
+
+  const switchPlayers = function () {
+    gameBoard._currentPlayer =
+      gameBoard._currentPlayer === gameBoard._player1
+        ? gameBoard._player2
+        : gameBoard._player1;
+  };
+
+  const addPlayerScore = function (index) {
+    gameBoard._currentPlayer === gameBoard._player1
+      ? gameBoard._player2Score.push(+index)
+      : gameBoard._player1Score.push(+index);
+    console.log(gameBoard._player1Score);
+    console.log(gameBoard._player2Score);
+  };
+
+  /**
+   * Compares player's score to the winning condition's array
+   */
+  const comparingScores = function (winningCond, playerScore) {
+    const playerScoreString = JSON.stringify(playerScore);
+    console.log(playerScoreString);
+
+    const comparingScores = winningCond.some(function (score) {
+      return JSON.stringify(score) === playerScoreString;
+    });
+    console.log(comparingScores);
+
+    return comparingScores;
+  };
+
+  const checkGameOver = function () {
+    if (comparingScores(gameBoard._winningConditions, gameBoard._player1Score))
+      alert('Player 1 Wins!');
+
+    if (comparingScores(gameBoard._winningConditions, gameBoard._player2Score))
+      alert('Player 2 Wins!');
+  };
+
   // UI - Rendering
   /**
    * Renders tile which player selects
    */
   const renderTile = function (tile, index) {
-    if (tile.innerText === '') {
-      gameBoard._board = +index;
-      console.log(gameBoard._board);
-
-      tile.innerText = gameBoard._currentPlayer;
+    if (tile.textContent === '') {
+      tile.textContent = gameBoard._currentPlayer;
       tile.classList.add(`player${gameBoard._currentPlayer}`);
+      console.log(index);
 
-      gameBoard._currentPlayer =
-        gameBoard._currentPlayer === gameBoard._player1
-          ? gameBoard._player2
-          : gameBoard._player1;
-      // if (gameBoard._currentPlayer === gameBoard._player1) {
-      //   gameBoard._currentPlayer = gameBoard._player2;
-      // } else {
-      //   gameBoard._currentPlayer = gameBoard._player1;
-      // }
-      console.log(gameBoard._currentPlayer);
+      switchPlayers();
+      addPlayerScore(index);
+      checkGameOver();
     }
   };
 
