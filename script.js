@@ -67,7 +67,7 @@ window.addEventListener('DOMContentLoaded', () => {
   /**
    * Compares player's score to the winning condition's array
    */
-  const comparingScores = function (winningCond, playerScore) {
+  const comparingScores = function () {
     for (let i = 0; i <= 7; i++) {
       const winCondition = gameBoard._winningConditions[i];
 
@@ -91,7 +91,11 @@ window.addEventListener('DOMContentLoaded', () => {
 
   const checkGameOver = function () {
     comparingScores();
-    if (gameBoard._roundWon) alert('Player Wins!');
+    if (gameBoard._roundWon) {
+      announcer.textContent = `Player ${gameBoard._currentPlayer} Wins!`;
+      announcer.classList.remove('hide');
+      roundOver();
+    }
 
     // if (comparingScores(gameBoard._winningConditions, gameBoard._player2Score))
     //   alert('Player 2 Wins!');
@@ -108,8 +112,8 @@ window.addEventListener('DOMContentLoaded', () => {
       tile.classList.add(`player${gameBoard._currentPlayer}`);
 
       addPlayerScore(index);
-      switchPlayers();
       checkGameOver();
+      switchPlayers();
     }
   };
 
