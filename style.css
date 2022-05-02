@@ -58,6 +58,14 @@
 .announcer {
   color: #FAFAFA;
   margin-top: 20px;
+  text-align: center;
+}
+
+.score-divider {
+  display: flex;
+  gap: 50px;
+  flex-direction: row;
+  justify-content: center;
 }
 
 .score {
@@ -93,4 +101,9 @@
 #reset:hover {
   transform: scale(1.1);
   border-radius: 5px;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
 }

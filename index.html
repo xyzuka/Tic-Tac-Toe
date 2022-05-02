@@ -12,9 +12,7 @@
       <section class="title">
         <h1 class="title">Tic Tac Toe</h1>
       </section>
-      <section class="player-turn">
-        <!-- <h3 class="display-player playerX">Make your move</h3> -->
-      </section>
+      <section class="player-turn"></section>
       <section class="game-container">
         <div class="tile"></div>
         <div class="tile"></div>
@@ -28,11 +26,15 @@
       </section>
       <section class="display announcer playerX">Player X's Turn</section>
       <div class="scoreboard">
-        <section class="score scoreX">Player X Score = 0</section>
-        <section class="score scoreO">Player O Score = 0</section>
+        <section class="score">First player to reach 3 points wins!</section>
+        <div class="score-divider">
+          <section class="score scoreX">Player X = 0</section>
+          <section class="score scoreO">Player O = 0</section>
+        </div>
       </div>
 
       <section class="controls">
+        <button id="reset">Reset Board</button>
         <button id="reset">Reset Game</button>
       </section>
     </main>

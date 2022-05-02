@@ -6,6 +6,8 @@ window.addEventListener('DOMContentLoaded', () => {
   const tile = Array.from(document.querySelectorAll('.tile'));
   const resetBtn = document.querySelector('#reset');
   const announcer = document.querySelector('.announcer');
+  const player1Score = document.querySelector('.scoreX');
+  const player2Score = document.querySelector('.scoreO');
 
   /* Note: Indexes within the board
       [0] [1] [2]
@@ -27,6 +29,8 @@ window.addEventListener('DOMContentLoaded', () => {
     _player1: 'X',
     _player2: 'O',
     _currentPlayer: this._player1,
+    _player1Score: 0,
+    _player2Score: 0,
     _winningConditions: [
       [0, 1, 2],
       [3, 4, 5],
@@ -114,13 +118,15 @@ window.addEventListener('DOMContentLoaded', () => {
       announcer.textContent = `Player ${gameBoard._currentPlayer} Wins!`;
       resetAnnouncerColor();
       announcer.classList.add(`player${gameBoard._currentPlayer}`);
-      // resetBoard();
+
+      gameBoard._currentPlayer === 'X'
+        ? gameBoard._player1Score++
+        : gameBoard._player2Score++;
     }
 
     if (gameBoard._roundTie) {
       announcer.textContent = `It's a Draw!`;
       resetAnnouncerColor();
-      // resetBoard();
     }
   };
 
@@ -135,6 +141,11 @@ window.addEventListener('DOMContentLoaded', () => {
     announcer.textContent = `Player ${gameBoard._currentPlayer}'s turn`;
     resetAnnouncerColor();
     announcer.classList.add(`player${gameBoard._currentPlayer}`);
+  };
+
+  const renderScoreBoard = function () {
+    player1Score.textContent = `Player X = ${gameBoard._player1Score}`;
+    player2Score.textContent = `Player O = ${gameBoard._player2Score}`;
   };
 
   /**********************************/
@@ -152,6 +163,7 @@ window.addEventListener('DOMContentLoaded', () => {
       addPlayerScore(index);
       checkGameOver();
       switchPlayers();
+      renderScoreBoard();
     }
   };
 
