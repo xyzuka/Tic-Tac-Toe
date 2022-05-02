@@ -27,8 +27,6 @@ window.addEventListener('DOMContentLoaded', () => {
     _player1: 'X',
     _player2: 'O',
     _currentPlayer: this._player1,
-    _player1Score: [],
-    _player2Score: [],
     _winningConditions: [
       [0, 1, 2],
       [3, 4, 5],
@@ -49,14 +47,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const setCurrentPlayer = (() =>
     (gameBoard._currentPlayer = gameBoard._player1))();
 
-  const switchPlayers = function () {
-    gameBoard._currentPlayer =
-      gameBoard._currentPlayer === gameBoard._player1
-        ? gameBoard._player2
-        : gameBoard._player1;
-  };
-
-  const addPlayerScore = function (tile, index) {
+  const addPlayerScore = function (index) {
     // console.log(gameBoard._currentPlayer);
     // console.log(index);
     if (gameBoard._currentPlayer === gameBoard._player1) {
@@ -68,9 +59,22 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  const renderWinnerLine = function (tile, index) {
-    // tile.forEach((tile) => tile.classList.add('win'));
-    tile.classList.add('win');
+  const resetBoard = function () {
+    gameBoard._board = ['', '', '', '', '', '', '', '', ''];
+    gameBoard._isGameActive = true;
+    gameBoard._roundWon = false;
+    gameBoard._roundTie = false;
+    gameBoard._moves = 0;
+
+    if (gameBoard._currentPlayer === 'O') {
+      switchPlayers();
+    }
+
+    tile.forEach((tile) => {
+      tile.textContent = '';
+      tile.classList.remove('playerX');
+      tile.classList.remove('playerO');
+    });
   };
 
   /**
@@ -84,16 +88,11 @@ window.addEventListener('DOMContentLoaded', () => {
       const b = gameBoard._board[winCondition[1]];
       const c = gameBoard._board[winCondition[2]];
 
-      // console.log(`a: ${a}`);
-      // console.log(`b: ${b}`);
-      // console.log(`c: ${c}`);
-
       if (a === '' || b === '' || c === '') {
         continue;
       }
       if (a === b && b === c) {
         gameBoard._roundWon = true;
-        renderWinnerLine(tile, index);
         break;
       }
 
@@ -104,24 +103,38 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  const resetBoard = function () {};
+  const resetAnnouncerColor = function () {
+    announcer.classList.remove('playerX');
+    announcer.classList.remove('playerO');
+  };
 
-  const checkGameOver = function (tile, index) {
-    comparingScores(tile, index);
+  const checkGameOver = function () {
+    comparingScores();
     if (gameBoard._roundWon) {
       announcer.textContent = `Player ${gameBoard._currentPlayer} Wins!`;
-      announcer.classList.remove('hide');
-      resetBoard();
+      resetAnnouncerColor();
+      announcer.classList.add(`player${gameBoard._currentPlayer}`);
+      // resetBoard();
     }
 
     if (gameBoard._roundTie) {
       announcer.textContent = `It's a Draw!`;
-      announcer.classList.remove('hide');
-      resetBoard();
+      resetAnnouncerColor();
+      // resetBoard();
     }
+  };
 
-    // if (comparingScores(gameBoard._winningConditions, gameBoard._player2Score))
-    //   alert('Player 2 Wins!');
+  const switchPlayers = function () {
+    if (gameBoard._roundWon || gameBoard._roundTie) return;
+
+    gameBoard._currentPlayer =
+      gameBoard._currentPlayer === gameBoard._player1
+        ? gameBoard._player2
+        : gameBoard._player1;
+
+    announcer.textContent = `Player ${gameBoard._currentPlayer}'s turn`;
+    resetAnnouncerColor();
+    announcer.classList.add(`player${gameBoard._currentPlayer}`);
   };
 
   /**********************************/
@@ -130,12 +143,14 @@ window.addEventListener('DOMContentLoaded', () => {
    * Renders tile which player selects
    */
   const renderTile = function (tile, index) {
+    if (gameBoard._roundWon || gameBoard._roundTie) return;
+
     if (tile.textContent === '') {
       tile.textContent = gameBoard._currentPlayer;
       tile.classList.add(`player${gameBoard._currentPlayer}`);
 
-      addPlayerScore(tile, index);
-      checkGameOver(tile, index);
+      addPlayerScore(index);
+      checkGameOver();
       switchPlayers();
     }
   };
@@ -151,4 +166,6 @@ window.addEventListener('DOMContentLoaded', () => {
       tile.addEventListener('click', () => renderTile(tile, index));
     });
   })();
+
+  resetBtn.addEventListener('click', resetBoard);
 });

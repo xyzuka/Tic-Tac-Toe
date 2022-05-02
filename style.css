@@ -54,19 +54,25 @@
   display: none;
 }
 
+.scoreboard,
+.announcer {
+  color: #FAFAFA;
+  margin-top: 20px;
+}
+
+.score {
+  padding-top: 10px;
+}
+
 .playerX {
   color: #DC2626;
   transition: all 0.3s ease-in;
 }
 
 .playerO {
-  color: #0284C7;;
+  color: #0284C7;
+  ;
   transition: all 0.3s ease-in;
-}
-
-.announcer {
-  color: #FAFAFA;
-  margin-top: 20px;
 }
 
 .win {
