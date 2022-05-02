@@ -20,6 +20,8 @@ window.addEventListener('DOMContentLoaded', () => {
    */
   const gameBoard = {
     _roundWon: false,
+    _moves: 0,
+    _roundTie: false,
     _isGameActive: true,
     _board: ['', '', '', '', '', '', '', '', ''],
     _player1: 'X',
@@ -54,20 +56,27 @@ window.addEventListener('DOMContentLoaded', () => {
         : gameBoard._player1;
   };
 
-  const addPlayerScore = function (index) {
+  const addPlayerScore = function (tile, index) {
     // console.log(gameBoard._currentPlayer);
     // console.log(index);
     if (gameBoard._currentPlayer === gameBoard._player1) {
       gameBoard._board[index] = gameBoard._currentPlayer;
+      gameBoard._moves++;
     } else {
       gameBoard._board[index] = gameBoard._currentPlayer;
+      gameBoard._moves++;
     }
+  };
+
+  const renderWinnerLine = function (tile, index) {
+    // tile.forEach((tile) => tile.classList.add('win'));
+    tile.classList.add('win');
   };
 
   /**
    * Compares player's score to the winning condition's array
    */
-  const comparingScores = function (winningCond, playerScore) {
+  const comparingScores = function (tile, index) {
     for (let i = 0; i <= 7; i++) {
       const winCondition = gameBoard._winningConditions[i];
 
@@ -84,14 +93,32 @@ window.addEventListener('DOMContentLoaded', () => {
       }
       if (a === b && b === c) {
         gameBoard._roundWon = true;
+        renderWinnerLine(tile, index);
+        break;
+      }
+
+      if (gameBoard._moves === 9) {
+        gameBoard._roundTie = true;
         break;
       }
     }
   };
 
-  const checkGameOver = function () {
-    comparingScores();
-    if (gameBoard._roundWon) alert('Player Wins!');
+  const resetBoard = function () {};
+
+  const checkGameOver = function (tile, index) {
+    comparingScores(tile, index);
+    if (gameBoard._roundWon) {
+      announcer.textContent = `Player ${gameBoard._currentPlayer} Wins!`;
+      announcer.classList.remove('hide');
+      resetBoard();
+    }
+
+    if (gameBoard._roundTie) {
+      announcer.textContent = `It's a Draw!`;
+      announcer.classList.remove('hide');
+      resetBoard();
+    }
 
     // if (comparingScores(gameBoard._winningConditions, gameBoard._player2Score))
     //   alert('Player 2 Wins!');
@@ -107,9 +134,9 @@ window.addEventListener('DOMContentLoaded', () => {
       tile.textContent = gameBoard._currentPlayer;
       tile.classList.add(`player${gameBoard._currentPlayer}`);
 
-      addPlayerScore(index);
+      addPlayerScore(tile, index);
+      checkGameOver(tile, index);
       switchPlayers();
-      checkGameOver();
     }
   };
 
