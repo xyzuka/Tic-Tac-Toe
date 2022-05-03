@@ -2,10 +2,10 @@
 
 window.addEventListener('DOMContentLoaded', () => {
   // DOM Selection
-  const playerDisplay = document.querySelector('.display-player');
   const tile = Array.from(document.querySelectorAll('.tile'));
   const resetBtn = document.querySelector('#reset');
   const announcer = document.querySelector('.announcer');
+  const finalWinnerAnnouncement = document.querySelector('.score');
   const player1Score = document.querySelector('.scoreX');
   const player2Score = document.querySelector('.scoreO');
 
@@ -84,7 +84,7 @@ window.addEventListener('DOMContentLoaded', () => {
   /**
    * Compares player's score to the winning condition's array
    */
-  const comparingScores = function (tile, index) {
+  const checkingWin = function (tile, index) {
     for (let i = 0; i <= 7; i++) {
       const winCondition = gameBoard._winningConditions[i];
 
@@ -99,11 +99,12 @@ window.addEventListener('DOMContentLoaded', () => {
         gameBoard._roundWon = true;
         break;
       }
+    }
+  };
 
-      if (gameBoard._moves === 9) {
-        gameBoard._roundTie = true;
-        break;
-      }
+  const checkingDraw = function () {
+    if (gameBoard._moves === 9 && !gameBoard._roundWon) {
+      return (gameBoard._roundTie = true);
     }
   };
 
@@ -113,7 +114,8 @@ window.addEventListener('DOMContentLoaded', () => {
   };
 
   const checkGameOver = function () {
-    comparingScores();
+    checkingWin();
+    checkingDraw();
     if (gameBoard._roundWon) {
       announcer.textContent = `Player ${gameBoard._currentPlayer} Wins!`;
       resetAnnouncerColor();
@@ -127,6 +129,16 @@ window.addEventListener('DOMContentLoaded', () => {
     if (gameBoard._roundTie) {
       announcer.textContent = `It's a Draw!`;
       resetAnnouncerColor();
+    }
+
+    if (gameBoard._player1Score === 1) {
+      endGame();
+      return;
+    }
+
+    if (gameBoard._player2Score === 1) {
+      endGame();
+      return;
     }
   };
 
@@ -146,6 +158,12 @@ window.addEventListener('DOMContentLoaded', () => {
   const renderScoreBoard = function () {
     player1Score.textContent = `Player X = ${gameBoard._player1Score}`;
     player2Score.textContent = `Player O = ${gameBoard._player2Score}`;
+  };
+
+  const endGame = function () {
+    announcer.textContent = '';
+    resetBtn.remove();
+    finalWinnerAnnouncement.textContent = `Player ${gameBoard._currentPlayer} wins the game!`;
   };
 
   /**********************************/

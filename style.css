@@ -64,12 +64,19 @@
 .score-divider {
   display: flex;
   gap: 50px;
+  padding-top: 10px;
   flex-direction: row;
   justify-content: center;
 }
 
-.score {
-  padding-top: 10px;
+.scoreX {
+  color: #DC2626;
+  transition: all 0.3s ease-in;
+}
+
+.scoreO {
+  color: #0284C7;
+  transition: all 0.3s ease-in;
 }
 
 .playerX {
