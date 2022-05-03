@@ -4,6 +4,8 @@ window.addEventListener('DOMContentLoaded', () => {
   // DOM Selection
   const tile = Array.from(document.querySelectorAll('.tile'));
   const resetBtn = document.querySelector('#reset');
+  const resetGameBtn = document.querySelector('#reset-game');
+
   const announcer = document.querySelector('.announcer');
   const finalWinnerAnnouncement = document.querySelector('.score');
   const player1Score = document.querySelector('.scoreX');
@@ -81,6 +83,36 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   };
 
+  const resetGame = function () {
+    gameBoard._roundWon = false;
+    gameBoard._moves = 0;
+    gameBoard._roundTie = false;
+    gameBoard._isGameActive = true;
+    gameBoard._board = ['', '', '', '', '', '', '', '', ''];
+    gameBoard._player1 = 'X';
+    gameBoard._player2 = 'O';
+    gameBoard._currentPlayer = gameBoard._player1;
+    gameBoard._player1Score = 0;
+    gameBoard._player2Score = 0;
+
+    if (gameBoard._currentPlayer === 'O') {
+      switchPlayers();
+    }
+
+    resetBtn.classList.remove('hide');
+
+    announcer.textContent = `Player ${gameBoard._currentPlayer}'s turn`;
+    finalWinnerAnnouncement.textContent = `First player to reach 3 points wins!`;
+
+    renderScoreBoard();
+
+    tile.forEach((tile) => {
+      tile.textContent = '';
+      tile.classList.remove('playerX');
+      tile.classList.remove('playerO');
+    });
+  };
+
   /**
    * Compares player's score to the winning condition's array
    */
@@ -131,12 +163,12 @@ window.addEventListener('DOMContentLoaded', () => {
       resetAnnouncerColor();
     }
 
-    if (gameBoard._player1Score === 1) {
+    if (gameBoard._player1Score === 3) {
       endGame();
       return;
     }
 
-    if (gameBoard._player2Score === 1) {
+    if (gameBoard._player2Score === 3) {
       endGame();
       return;
     }
@@ -161,9 +193,13 @@ window.addEventListener('DOMContentLoaded', () => {
   };
 
   const endGame = function () {
+    gameBoard._isGameActive = false;
     announcer.textContent = '';
-    resetBtn.remove();
     finalWinnerAnnouncement.textContent = `Player ${gameBoard._currentPlayer} wins the game!`;
+
+    if (!gameBoard._isGameActive) {
+      resetBtn.classList.add('hide');
+    }
   };
 
   /**********************************/
@@ -198,4 +234,6 @@ window.addEventListener('DOMContentLoaded', () => {
   })();
 
   resetBtn.addEventListener('click', resetBoard);
+
+  resetGameBtn.addEventListener('click', resetGame);
 });
