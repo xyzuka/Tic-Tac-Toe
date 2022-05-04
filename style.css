@@ -7,15 +7,23 @@
   box-sizing: border-box;
 }
 
-.background {
+.menu {
   background-color: #18181B;
   height: 100vh;
   padding: 20px;
   display: flex;
   align-items: center;
   flex-direction: column;
+}
+
+.game {
+  background-color: #18181B;
+  height: 100vh;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  
 }
 
 .title {
@@ -50,6 +58,10 @@
   color: #18181B;
 }
 
+.tile:hover {
+  background-color: #434343;
+}
+
 .hide {
   display: none;
 }
@@ -57,7 +69,7 @@
 .scoreboard,
 .announcer {
   color: #FAFAFA;
-  margin-top: 20px;
+  margin-top: 10px;
   text-align: center;
 }
 
@@ -68,6 +80,24 @@
   flex-direction: row;
   justify-content: center;
 }
+
+.main-announcer {
+  color: #FAFAFA;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+.announce-winner {
+  padding-top: 10px;
+}
+
+.player-selection {
+  margin-top: 20px;
+  color: #FAFAFA;
+  display: flex;
+  flex-direction: column;
+}
+
 
 .scoreX {
   color: #DC2626;
@@ -86,7 +116,6 @@
 
 .playerO {
   color: #0284C7;
-  ;
   transition: all 0.3s ease-in;
 }
 
@@ -95,7 +124,8 @@
 }
 
 #reset,
-#reset-game {
+#reset-game,
+#opponent-selection {
   font-size: 10px;
   margin-top: 20px;
   color: #18181B;
@@ -106,7 +136,10 @@
   transition: all 0.3s ease-in-out;
 }
 
-#reset:hover {
+#reset:hover,
+#opponent-selection:hover,
+.reset-game:hover,
+.return-menu:hover{
   transform: scale(1.1);
   border-radius: 5px;
 }

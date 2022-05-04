@@ -8,11 +8,40 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <main class="background">
+    <main class="menu">
       <section class="title">
         <h1 class="title">Tic Tac Toe</h1>
       </section>
-      <section class="player-turn"></section>
+      <section class="main-announcer">
+        First player to reach 3 points wins!
+      </section>
+
+      <section class="player-selection">
+        <section class="opponent">Pick your opponent</section>
+        <button id="opponent-selection" class="opponent-friend">Friend</button>
+        <button id="opponent-selection" class="opponent-AI">
+          Unbeatable AI
+        </button>
+      </section>
+    </main>
+
+    <main class="game hide">
+      <section class="title">
+        <h1 class="title">Tic Tac Toe</h1>
+      </section>
+      <section class="main-announcer">
+        First player to reach 3 points wins!
+      </section>
+
+      <div class="scoreboard">
+        <div class="score-divider">
+          <section class="score scoreX">Player X: 0</section>
+          <section class="score scoreO">Player O: 0</section>
+        </div>
+        <section class="display announcer playerX">Player X's Turn</section>
+        <section class="display announce-winner"></section>
+      </div>
+
       <section class="game-container">
         <div class="tile"></div>
         <div class="tile"></div>
@@ -24,18 +53,11 @@
         <div class="tile"></div>
         <div class="tile"></div>
       </section>
-      <section class="display announcer playerX">Player X's Turn</section>
-      <div class="scoreboard">
-        <section class="score">First player to reach 3 points wins!</section>
-        <div class="score-divider">
-          <section class="score scoreX">Player X = 0</section>
-          <section class="score scoreO">Player O = 0</section>
-        </div>
-      </div>
 
       <section class="controls">
-        <button id="reset">Reset Board</button>
-        <button id="reset-game">Reset Game</button>
+        <!-- <button id="reset">Reset Board</button> -->
+        <button id="reset-game" class="reset-game">Reset Game</button>
+        <button id="reset-game" class="return-menu">Menu</button>
       </section>
     </main>
   </body>

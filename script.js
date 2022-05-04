@@ -3,10 +3,15 @@
 window.addEventListener('DOMContentLoaded', () => {
   // DOM Selection
   const tile = Array.from(document.querySelectorAll('.tile'));
-  const resetBtn = document.querySelector('#reset');
-  const resetGameBtn = document.querySelector('#reset-game');
+  const game = document.querySelector('.game');
+  const menu = document.querySelector('.menu');
+  const resetGameBtn = document.querySelector('.reset-game');
+  const MenuBtn = document.querySelector('.return-menu');
+  const pickFriendBtn = document.querySelector('.opponent-friend');
+  const pickAIBtn = document.querySelector('.opponent-AI');
 
   const announcer = document.querySelector('.announcer');
+  const announceWinner = document.querySelector('.announce-winner');
   const finalWinnerAnnouncement = document.querySelector('.score');
   const player1Score = document.querySelector('.scoreX');
   const player2Score = document.querySelector('.scoreO');
@@ -23,6 +28,7 @@ window.addEventListener('DOMContentLoaded', () => {
    * Contain the state and memory storage of the game
    */
   const gameBoard = {
+    _opponent: '',
     _roundWon: false,
     _moves: 0,
     _roundTie: false,
@@ -50,8 +56,19 @@ window.addEventListener('DOMContentLoaded', () => {
   /**
    * Contains game logic
    */
-  const setCurrentPlayer = (() =>
-    (gameBoard._currentPlayer = gameBoard._player1))();
+  const setOpponentAsFriend = function () {
+    gameBoard._opponent = 'friend';
+    console.log(gameBoard._opponent);
+    gameBoard._currentPlayer = gameBoard._player1;
+    renderScoreBoard();
+  };
+
+  const setOpponentAsAI = function () {
+    gameBoard._opponent = 'AI';
+    console.log(gameBoard._opponent);
+    gameBoard._currentPlayer = gameBoard._player1;
+    renderScoreBoard();
+  };
 
   const addPlayerScore = function (index) {
     // console.log(gameBoard._currentPlayer);
@@ -67,20 +84,26 @@ window.addEventListener('DOMContentLoaded', () => {
 
   const resetBoard = function () {
     gameBoard._board = ['', '', '', '', '', '', '', '', ''];
-    gameBoard._isGameActive = true;
+    // gameBoard._isGameActive = true;
     gameBoard._roundWon = false;
     gameBoard._roundTie = false;
     gameBoard._moves = 0;
 
-    if (gameBoard._currentPlayer === 'O') {
-      switchPlayers();
+    if (gameBoard._currentPlayer === 'O') switchPlayers();
+
+    if (!gameBoard._isGameActive) {
+      announcer.textContent = '';
+    } else {
+      announcer.textContent = `Player ${gameBoard._currentPlayer}'s turn`;
     }
 
-    tile.forEach((tile) => {
-      tile.textContent = '';
-      tile.classList.remove('playerX');
-      tile.classList.remove('playerO');
-    });
+    if (gameBoard._isGameActive) {
+      tile.forEach((tile) => {
+        tile.textContent = '';
+        tile.classList.remove('playerX');
+        tile.classList.remove('playerO');
+      });
+    }
   };
 
   const resetGame = function () {
@@ -99,10 +122,16 @@ window.addEventListener('DOMContentLoaded', () => {
       switchPlayers();
     }
 
-    resetBtn.classList.remove('hide');
+    if (!gameBoard._isGameActive) {
+      announceWinner.classList.add('hide');
+      return;
+    }
 
-    announcer.textContent = `Player ${gameBoard._currentPlayer}'s turn`;
-    finalWinnerAnnouncement.textContent = `First player to reach 3 points wins!`;
+    if (gameBoard._isGameActive) {
+      announceWinner.classList.add('hide');
+      announcer.textContent = `Player ${gameBoard._currentPlayer}'s turn`;
+      finalWinnerAnnouncement.textContent = `First player to reach 3 points wins!`;
+    }
 
     renderScoreBoard();
 
@@ -156,19 +185,22 @@ window.addEventListener('DOMContentLoaded', () => {
       gameBoard._currentPlayer === 'X'
         ? gameBoard._player1Score++
         : gameBoard._player2Score++;
+
+      setTimeout(resetBoard, 1000);
     }
 
     if (gameBoard._roundTie) {
       announcer.textContent = `It's a Draw!`;
       resetAnnouncerColor();
+      setTimeout(resetBoard, 1000);
     }
 
-    if (gameBoard._player1Score === 3) {
+    if (gameBoard._player1Score === 1) {
       endGame();
       return;
     }
 
-    if (gameBoard._player2Score === 3) {
+    if (gameBoard._player2Score === 1) {
       endGame();
       return;
     }
@@ -188,22 +220,48 @@ window.addEventListener('DOMContentLoaded', () => {
   };
 
   const renderScoreBoard = function () {
-    player1Score.textContent = `Player X = ${gameBoard._player1Score}`;
-    player2Score.textContent = `Player O = ${gameBoard._player2Score}`;
+    if (gameBoard._opponent === 'friend') {
+      player1Score.textContent = `Player X: ${gameBoard._player1Score}`;
+      player2Score.textContent = `Player O: ${gameBoard._player2Score}`;
+    } else {
+      player1Score.textContent = 'Player (X) Score: 0';
+      player2Score.textContent = 'AI (O) Score: 0';
+    }
   };
 
   const endGame = function () {
     gameBoard._isGameActive = false;
-    announcer.textContent = '';
-    finalWinnerAnnouncement.textContent = `Player ${gameBoard._currentPlayer} wins the game!`;
-
-    if (!gameBoard._isGameActive) {
-      resetBtn.classList.add('hide');
-    }
+    announceWinner.textContent = `Player ${gameBoard._currentPlayer} wins the game!`;
   };
 
   /**********************************/
+  // Minimax Algorithm - An unbeatable AI opponent
+  // Player - Minimiser
+  // AI - Maximiser
+
+  /**********************************/
   // UI - Rendering
+
+  const playWithFriend = function (e) {
+    e.preventDefault();
+    menu.classList.add('hide');
+    game.classList.remove('hide');
+    setOpponentAsFriend();
+  };
+
+  const playWithAI = function (e) {
+    e.preventDefault();
+    menu.classList.add('hide');
+    game.classList.remove('hide');
+    setOpponentAsAI();
+  };
+
+  const returnToMenu = function (e) {
+    e.preventDefault();
+    game.classList.add('hide');
+    menu.classList.remove('hide');
+  };
+
   /**
    * Renders tile which player selects
    */
@@ -233,7 +291,8 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   })();
 
-  resetBtn.addEventListener('click', resetBoard);
-
   resetGameBtn.addEventListener('click', resetGame);
+  MenuBtn.addEventListener('click', returnToMenu);
+  pickFriendBtn.addEventListener('click', playWithFriend);
+  pickAIBtn.addEventListener('click', playWithAI);
 });
