@@ -28,7 +28,7 @@ window.addEventListener('DOMContentLoaded', () => {
    * Contain the state and memory storage of the game
    */
   const gameBoard = {
-    _winningScore: 3,
+    _winningScore: 1,
     _opponent: '',
     _roundWon: false,
     _moves: 0,
@@ -71,7 +71,7 @@ window.addEventListener('DOMContentLoaded', () => {
     renderScoreBoard();
   };
 
-  const addPlayerScore = function (index) {
+  const addPlayerMoves = function (index) {
     if (gameBoard._currentPlayer === gameBoard._player1) {
       gameBoard._board[index] = gameBoard._currentPlayer;
       gameBoard._moves++;
@@ -90,13 +90,19 @@ window.addEventListener('DOMContentLoaded', () => {
     if (gameBoard._isGameActive && gameBoard._currentPlayer === 'O')
       switchPlayers();
 
-    if (!gameBoard._isGameActive)
+    if (!gameBoard._isGameActive) {
       announceWinner.textContent = `Player ${gameBoard._currentPlayer} wins the game!`;
-    // } else {
-    //   announcer.textContent = `Player ${gameBoard._currentPlayer}'s turn`;
-    // }
+      announcer.classList.add('hide');
+    } else {
+      announcer.textContent = `Player ${gameBoard._currentPlayer}'s turn`;
+    }
 
-    if (gameBoard._isGameActive) {
+    if (gameBoard._roundTie) {
+      announceWinner.classList.add('hide');
+    }
+
+    if (gameBoard._isGameActive && !gameBoard._roundTie) {
+      announceWinner.classList.add('hide');
       tile.forEach((tile) => {
         tile.textContent = '';
         tile.classList.remove('playerX');
@@ -165,22 +171,25 @@ window.addEventListener('DOMContentLoaded', () => {
   const checkGameOver = function () {
     checkingWin();
     checkingDraw();
+
     if (gameBoard._roundWon) {
-      announcer.textContent = `Player ${gameBoard._currentPlayer} Wins!`;
-      // resetAnnouncerColor();
+      announceWinner.textContent = `Player ${gameBoard._currentPlayer} Wins!`;
+      announceWinner.classList.remove('hide');
+      resetAnnouncerColor();
       announcer.classList.add(`player${gameBoard._currentPlayer}`);
 
       gameBoard._currentPlayer === 'X'
         ? gameBoard._player1Score++
         : gameBoard._player2Score++;
 
-      setTimeout(resetBoard, 1000);
+      setTimeout(resetBoard, 1500);
     }
 
     if (gameBoard._roundTie) {
-      announcer.textContent = `It's a Draw!`;
-      // resetAnnouncerColor();
-      setTimeout(resetBoard, 1000);
+      announceWinner.textContent = `No one wins! It's a Draw!`;
+      announceWinner.classList.remove('hide');
+      resetAnnouncerColor();
+      setTimeout(resetBoard, 1500);
     }
 
     if (gameBoard._player1Score === gameBoard._winningScore) {
@@ -222,10 +231,21 @@ window.addEventListener('DOMContentLoaded', () => {
       player2Score.textContent = 'AI (O) Score: 0';
     }
 
-    if (gameBoard._isGameActive) {
+    if (gameBoard._roundWon && gameBoard._isGameActive)
+      announceWinner.classList.remove('hide');
+
+    if (
+      !gameBoard._roundWon &&
+      gameBoard._isGameActive &&
+      !gameBoard._roundTie
+    ) {
       announceWinner.classList.add('hide');
       announcer.textContent = `Player ${gameBoard._currentPlayer}'s turn`;
     }
+
+    // if (gameBoard._roundTie && gameBoard._isGameActive) {
+    //   announceWinner.classList.add('hide');
+    // }
 
     if (!gameBoard._isGameActive) {
       announceWinner.textContent = `Player ${gameBoard._currentPlayer} wins the game!`;
@@ -277,7 +297,7 @@ window.addEventListener('DOMContentLoaded', () => {
       tile.textContent = gameBoard._currentPlayer;
       tile.classList.add(`player${gameBoard._currentPlayer}`);
 
-      addPlayerScore(index);
+      addPlayerMoves(index);
       checkGameOver();
       switchPlayers();
       renderScoreBoard();
