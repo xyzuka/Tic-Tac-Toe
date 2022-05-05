@@ -28,7 +28,7 @@ window.addEventListener('DOMContentLoaded', () => {
    * Contain the state and memory storage of the game
    */
   const gameBoard = {
-    _winningScore: 1,
+    _winningScore: 2,
     _opponent: '',
     _roundWon: false,
     _moves: 0,
@@ -175,7 +175,6 @@ window.addEventListener('DOMContentLoaded', () => {
     if (gameBoard._roundWon) {
       announceWinner.textContent = `Player ${gameBoard._currentPlayer} Wins!`;
       announceWinner.classList.remove('hide');
-      resetAnnouncerColor();
       announcer.classList.add(`player${gameBoard._currentPlayer}`);
 
       gameBoard._currentPlayer === 'X'
@@ -188,7 +187,6 @@ window.addEventListener('DOMContentLoaded', () => {
     if (gameBoard._roundTie) {
       announceWinner.textContent = `No one wins! It's a Draw!`;
       announceWinner.classList.remove('hide');
-      resetAnnouncerColor();
       setTimeout(resetBoard, 1500);
     }
 
@@ -240,12 +238,9 @@ window.addEventListener('DOMContentLoaded', () => {
       !gameBoard._roundTie
     ) {
       announceWinner.classList.add('hide');
+      announcer.classList.remove('hide');
       announcer.textContent = `Player ${gameBoard._currentPlayer}'s turn`;
     }
-
-    // if (gameBoard._roundTie && gameBoard._isGameActive) {
-    //   announceWinner.classList.add('hide');
-    // }
 
     if (!gameBoard._isGameActive) {
       announceWinner.textContent = `Player ${gameBoard._currentPlayer} wins the game!`;
@@ -257,11 +252,6 @@ window.addEventListener('DOMContentLoaded', () => {
     gameBoard._isGameActive = false;
     renderScoreBoard();
   };
-
-  /**********************************/
-  // Minimax Algorithm - An unbeatable AI opponent
-  // Player - Minimiser
-  // AI - Maximiser
 
   /**********************************/
   // UI - Rendering
@@ -320,4 +310,9 @@ window.addEventListener('DOMContentLoaded', () => {
   MenuBtn.addEventListener('click', returnToMenu);
   pickFriendBtn.addEventListener('click', playWithFriend);
   pickAIBtn.addEventListener('click', playWithAI);
+
+  /**********************************/
+  // Minimax Algorithm - An unbeatable AI opponent
+  // Player - Minimiser
+  // AI - Maximiser
 });
