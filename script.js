@@ -27,9 +27,8 @@ window.addEventListener('DOMContentLoaded', () => {
    * Contain the state and memory storage of the game
    */
   const gameBoard = {
-    _aiTurn: false,
-    _playersTurn: false,
     _winningScore: 2,
+    _aiTurn: false,
     _opponent: '',
     _roundWon: false,
     _moves: 0,
@@ -58,28 +57,22 @@ window.addEventListener('DOMContentLoaded', () => {
   /**
    * Contains game logic
    */
+
+  // Sets opponent as your friend (disabling AI)
   const setOpponentAsFriend = function () {
     gameBoard._opponent = 'friend';
-    console.log(gameBoard._opponent);
     gameBoard._currentPlayer = gameBoard._player1;
-    renderScoreBoard();
   };
 
+  // Enables AI opponent
   const setOpponentAsAI = function () {
     gameBoard._opponent = 'AI';
     gameBoard._aiTurn = true;
-    console.log(gameBoard._opponent);
     gameBoard._currentPlayer = gameBoard._player1;
-    renderScoreBoard();
-
-    if (
-      gameBoard._isGameActive &&
-      gameBoard._opponent === 'AI' &&
-      gameBoard._aiTurn
-    )
-      AISelectsTile();
+    startGameAI();
   };
 
+  // Tracker which determines if the game is a draw
   const addPlayerMoves = function (index) {
     if (gameBoard._currentPlayer === gameBoard._player1) {
       gameBoard._board[index] = gameBoard._currentPlayer;
@@ -90,7 +83,10 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  const resetBoard = function () {
+  // Resets the board when a player wins the round
+  const restartRound = function () {
+    if (!gameBoard._isGameActive) return;
+
     gameBoard._aiTurn = true;
     gameBoard._isGameActive = true;
     gameBoard._playersTurn = false;
@@ -105,7 +101,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     if (gameBoard._isGameActive && !gameBoard._roundTie) {
       announceWinner.classList.add('hide');
-      clearGameBoard();
+      resetGameBoardRendering();
     }
 
     if (
@@ -113,56 +109,90 @@ window.addEventListener('DOMContentLoaded', () => {
       gameBoard._opponent === 'AI' &&
       gameBoard._aiTurn
     )
-      AISelectsTile();
-
-    if (!gameBoard._isGameActive) {
-      announceWinner.textContent = `Player ${gameBoard._currentPlayer} wins the game!`;
-      announcer.classList.add('hide');
-    } else {
-      announcer.textContent = `Player ${gameBoard._currentPlayer}'s turn`;
-    }
+      startGameAI();
 
     if (gameBoard._roundTie) {
       announceWinner.classList.add('hide');
     }
   };
 
-  const resettingGameState = function () {
+  // Restarts a game in progress to a new game
+  const resetGame = function () {
     gameBoard._aiTurn = true;
-    gameBoard._isGameActive = true;
-    gameBoard._playersTurn = false;
-    gameBoard._board = ['', '', '', '', '', '', '', '', ''];
     gameBoard._roundWon = false;
-    gameBoard._roundTie = false;
     gameBoard._moves = 0;
-    gameBoard._player1Score = 0;
-    gameBoard._player2Score = 0;
+    gameBoard._roundTie = false;
+    gameBoard._isGameActive = true;
+    gameBoard._board = ['', '', '', '', '', '', '', '', ''];
     gameBoard._player1 = 'X';
     gameBoard._player2 = 'O';
     gameBoard._currentPlayer = gameBoard._player1;
-  };
+    gameBoard._player1Score = 0;
+    gameBoard._player2Score = 0;
 
-  const resetGame = function () {
     if (gameBoard._isGameActive && gameBoard._currentPlayer === 'O') {
       switchPlayers();
     }
-    resettingGameState();
 
-    clearGameBoard();
+    resetGameBoardRendering();
 
     if (
       gameBoard._isGameActive &&
       gameBoard._opponent === 'AI' &&
       gameBoard._aiTurn
     )
-      AISelectsTile();
+      startGameAI();
 
     renderScoreBoard();
   };
 
-  /**
-   * Compares player's score to the winning condition's array
-   */
+  // Moves all X and Os from the Game board tiles
+  const resetGameBoardRendering = function () {
+    tile.forEach((tile) => {
+      tile.textContent = '';
+      tile.classList.remove('playerX');
+      tile.classList.remove('playerO');
+    });
+  };
+
+  // Resets the state/memory of the game
+  const resetGameBoardState = function () {
+    gameBoard._roundWon = false;
+    gameBoard._moves = 0;
+    gameBoard._roundTie = false;
+    gameBoard._isGameActive = true;
+    gameBoard._board = ['', '', '', '', '', '', '', '', ''];
+    gameBoard._player1 = 'X';
+    gameBoard._player2 = 'O';
+    gameBoard._currentPlayer = gameBoard._player1;
+    gameBoard._player1Score = 0;
+    gameBoard._player2Score = 0;
+  };
+
+  // Removes all colouring from the announcer text
+  const resetAnnouncerColor = function () {
+    announcer.classList.remove('playerX');
+    announcer.classList.remove('playerO');
+  };
+
+  // Renders scoreboard based on the chosen opponent
+  const renderScoreBoardPoints = function () {
+    if (gameBoard._opponent === 'friend') {
+      player1Score.textContent = `Player X: ${gameBoard._player1Score}`;
+      player2Score.textContent = `Player O: ${gameBoard._player2Score}`;
+    } else {
+      player1Score.textContent = `AI (X) Score: ${gameBoard._player1Score}`;
+      player2Score.textContent = `Player (O) Score: ${gameBoard._player2Score}`;
+    }
+  };
+
+  // Renders which player's turn is next
+  const renderTurnAnnouncer = function () {
+    announcer.textContent = `Player ${gameBoard._currentPlayer}'s turn`;
+    announcer.classList.add(`player${gameBoard._currentPlayer}`);
+  };
+
+  // Checks if the current round is won
   const checkingWin = function (tile, index) {
     for (let i = 0; i <= 7; i++) {
       const winCondition = gameBoard._winningConditions[i];
@@ -181,22 +211,19 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  // Checks if the current round is a draw
   const checkingDraw = function () {
     if (gameBoard._moves === 9 && !gameBoard._roundWon) {
       return (gameBoard._roundTie = true);
     }
   };
 
-  const resetAnnouncerColor = function () {
-    announcer.classList.remove('playerX');
-    announcer.classList.remove('playerO');
-  };
-
+  // Checks if the game is over
   const checkGameOver = function () {
     checkingWin();
     checkingDraw();
 
-    if (gameBoard._roundWon) {
+    if (gameBoard._roundWon && gameBoard._isGameActive) {
       announceWinner.textContent = `Player ${gameBoard._currentPlayer} Wins!`;
       announceWinner.classList.remove('hide');
       announcer.classList.add(`player${gameBoard._currentPlayer}`);
@@ -205,13 +232,13 @@ window.addEventListener('DOMContentLoaded', () => {
         ? gameBoard._player1Score++
         : gameBoard._player2Score++;
 
-      setTimeout(resetBoard, 1500);
+      setTimeout(restartRound, 1500);
     }
 
-    if (gameBoard._roundTie) {
+    if (gameBoard._roundTie && gameBoard._isGameActive) {
       announceWinner.textContent = `No one wins! It's a Draw!`;
       announceWinner.classList.remove('hide');
-      setTimeout(resetBoard, 1500);
+      setTimeout(restartRound, 1500);
     }
 
     if (gameBoard._player1Score === gameBoard._winningScore) {
@@ -225,11 +252,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  const renderTurnAnnouncer = function () {
-    announcer.textContent = `Player ${gameBoard._currentPlayer}'s turn`;
-    announcer.classList.add(`player${gameBoard._currentPlayer}`);
-  };
-
+  // Switches players
   const switchPlayers = function () {
     if (gameBoard._roundWon || gameBoard._roundTie) return;
 
@@ -246,31 +269,24 @@ window.addEventListener('DOMContentLoaded', () => {
           ? gameBoard._player2
           : gameBoard._player1;
 
-      if (gameBoard._aiTurn && !gameBoard._playersTurn) {
+      if (gameBoard._aiTurn) {
         gameBoard._aiTurn = false;
-        gameBoard._playersTurn = true;
       } else {
         gameBoard._aiTurn = true;
-        gameBoard._playersTurn = false;
       }
     }
 
     if (gameBoard._aiTurn) {
-      AISelectsTile();
+      startGameAI();
     }
 
     resetAnnouncerColor();
     renderTurnAnnouncer();
   };
 
+  // Renders the score board
   const renderScoreBoard = function () {
-    if (gameBoard._opponent === 'friend') {
-      player1Score.textContent = `Player X: ${gameBoard._player1Score}`;
-      player2Score.textContent = `Player O: ${gameBoard._player2Score}`;
-    } else {
-      player1Score.textContent = `AI (X) Score: ${gameBoard._player1Score}`;
-      player2Score.textContent = `Player (O) Score: ${gameBoard._player2Score}`;
-    }
+    renderScoreBoardPoints();
 
     if (gameBoard._roundWon && gameBoard._isGameActive)
       announceWinner.classList.remove('hide');
@@ -283,73 +299,70 @@ window.addEventListener('DOMContentLoaded', () => {
       announceWinner.classList.add('hide');
       announcer.classList.remove('hide');
       announcer.textContent = `Player ${gameBoard._currentPlayer}'s turn`;
+      resetAnnouncerColor();
+      announcer.classList.add(`player${gameBoard._currentPlayer}`);
     }
+  };
 
+  // Displays the winner of the game text
+  const displayGameWinner = function () {
     if (!gameBoard._isGameActive) {
       announceWinner.textContent = `Player ${gameBoard._currentPlayer} wins the game!`;
       announceWinner.classList.remove('hide');
     }
   };
 
+  // Ends the game and turns off the AI
   const endGame = function () {
     gameBoard._isGameActive = false;
+    gameBoard._aiTurn = false;
     renderScoreBoard();
+    displayGameWinner();
   };
 
   /**********************************/
   // UI - Rendering
 
-  const clearGameBoard = function () {
-    tile.forEach((tile) => {
-      tile.textContent = '';
-      tile.classList.remove('playerX');
-      tile.classList.remove('playerO');
-    });
-  };
-
-  const renderNewBoard = function () {
-    clearGameBoard();
-  };
-
-  const playWithFriend = function (e) {
-    e.preventDefault();
-    gameBoard._aiTurn = false;
-    renderNewBoard();
+  // Hides the menu and shows the game board
+  const hideMenu = function () {
     menu.classList.add('hide');
     game.classList.remove('hide');
-    setOpponentAsFriend();
   };
 
-  const playWithAI = function (e) {
-    e.preventDefault();
-    resetGame();
-    menu.classList.add('hide');
-    game.classList.remove('hide');
-
-    // Only render tiles if all tiles are empty (debugging the restart bug)
-    let emptyTilesRestart = [];
-    tile.forEach((tile, index) => {
-      if (tile.textContent === '') emptyTilesRestart.push(index);
-    });
-    if (emptyTilesRestart.length === 9) setOpponentAsAI();
-  };
-
+  // Hides the game and returns to the menu
   const returnToMenu = function (e) {
     e.preventDefault();
     game.classList.add('hide');
     menu.classList.remove('hide');
   };
 
+  // Initialise playing with a friend
+  const playWithFriend = function (e) {
+    e.preventDefault();
+    hideMenu();
+    resetGameBoardState();
+    resetGameBoardRendering();
+    setOpponentAsFriend();
+    renderScoreBoard();
+    renderTurnAnnouncer();
+  };
+
+  // Initialise playing with AI
+  const playWithAI = function (e) {
+    e.preventDefault();
+    hideMenu();
+    resetGameBoardState();
+    resetGameBoardRendering();
+    setOpponentAsAI();
+    renderScoreBoard();
+    renderTurnAnnouncer();
+  };
+
   /**
    * Renders tile which player selects
    */
   const renderTile = function (tile, index) {
-    if (
-      gameBoard._roundWon ||
-      gameBoard._roundTie ||
-      !gameBoard._isGameActive ||
-      gameBoard._opponent === 'AI'
-    )
+    if (gameBoard._roundWon || gameBoard._roundTie || !gameBoard._isGameActive)
       return;
 
     if (tile.textContent === '') {
@@ -375,31 +388,15 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   })();
 
+  // Buttons
   resetGameBtn.addEventListener('click', resetGame);
   MenuBtn.addEventListener('click', returnToMenu);
   pickFriendBtn.addEventListener('click', playWithFriend);
   pickAIBtn.addEventListener('click', playWithAI);
 
   /**********************************/
-  // Minimax Algorithm - An unbeatable AI opponent
-  // Player - Minimiser
-  // AI - Maximiser
-
-  const renderAITile = function (tile, randomEmptyTileIndex) {
-    if (gameBoard._roundWon || gameBoard._roundTie || !gameBoard._isGameActive)
-      return;
-
-    if (gameBoard._playersTurn && gameBoard._opponent === 'AI') return;
-
-    if (gameBoard._aiTurn) {
-      tile[randomEmptyTileIndex].textContent = 'X';
-      tile[randomEmptyTileIndex].classList.add(
-        `player${gameBoard._currentPlayer}`
-      );
-    }
-  };
-
-  const AISelectsTile = function () {
+  // AI
+  const startGameAI = function () {
     if (gameBoard._aiTurn && gameBoard._opponent === 'AI') {
       // Prevents player from clicking
 
@@ -431,6 +428,19 @@ window.addEventListener('DOMContentLoaded', () => {
       switchPlayers();
 
       renderScoreBoard();
+    }
+  };
+
+  // Renders the tile AI selects
+  const renderAITile = function (tile, randomEmptyTileIndex) {
+    if (gameBoard._roundWon || gameBoard._roundTie || !gameBoard._isGameActive)
+      return;
+
+    if (gameBoard._aiTurn) {
+      tile[randomEmptyTileIndex].textContent = 'X';
+      tile[randomEmptyTileIndex].classList.add(
+        `player${gameBoard._currentPlayer}`
+      );
     }
   };
 });
