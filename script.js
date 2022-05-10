@@ -71,7 +71,13 @@ window.addEventListener('DOMContentLoaded', () => {
     console.log(gameBoard._opponent);
     gameBoard._currentPlayer = gameBoard._player1;
     renderScoreBoard();
-    AISelectsTile();
+
+    if (
+      gameBoard._isGameActive &&
+      gameBoard._opponent === 'AI' &&
+      gameBoard._aiTurn
+    )
+      AISelectsTile();
   };
 
   const addPlayerMoves = function (index) {
@@ -85,6 +91,10 @@ window.addEventListener('DOMContentLoaded', () => {
   };
 
   const resetBoard = function () {
+    gameBoard._aiTurn = true;
+    gameBoard._isGameActive = true;
+    gameBoard._playersTurn = false;
+    gameBoard._currentPlayer = gameBoard._player1;
     gameBoard._board = ['', '', '', '', '', '', '', '', ''];
     gameBoard._roundWon = false;
     gameBoard._roundTie = false;
@@ -92,6 +102,18 @@ window.addEventListener('DOMContentLoaded', () => {
 
     if (gameBoard._isGameActive && gameBoard._currentPlayer === 'O')
       switchPlayers();
+
+    if (gameBoard._isGameActive && !gameBoard._roundTie) {
+      announceWinner.classList.add('hide');
+      clearGameBoard();
+    }
+
+    if (
+      gameBoard._isGameActive &&
+      gameBoard._opponent === 'AI' &&
+      gameBoard._aiTurn
+    )
+      AISelectsTile();
 
     if (!gameBoard._isGameActive) {
       announceWinner.textContent = `Player ${gameBoard._currentPlayer} wins the game!`;
@@ -103,42 +125,39 @@ window.addEventListener('DOMContentLoaded', () => {
     if (gameBoard._roundTie) {
       announceWinner.classList.add('hide');
     }
-
-    if (gameBoard._isGameActive && !gameBoard._roundTie) {
-      announceWinner.classList.add('hide');
-      tile.forEach((tile) => {
-        tile.textContent = '';
-        tile.classList.remove('playerX');
-        tile.classList.remove('playerO');
-      });
-    }
   };
 
-  const resetGame = function () {
-    (gameBoard._aiTurn = false),
-      (gameBoard._playersTurn = false),
-      (gameBoard._roundWon = false);
-    gameBoard._moves = 0;
-    gameBoard._roundTie = false;
+  const resettingGameState = function () {
+    gameBoard._aiTurn = true;
     gameBoard._isGameActive = true;
+    gameBoard._playersTurn = false;
     gameBoard._board = ['', '', '', '', '', '', '', '', ''];
+    gameBoard._roundWon = false;
+    gameBoard._roundTie = false;
+    gameBoard._moves = 0;
+    gameBoard._player1Score = 0;
+    gameBoard._player2Score = 0;
     gameBoard._player1 = 'X';
     gameBoard._player2 = 'O';
     gameBoard._currentPlayer = gameBoard._player1;
-    gameBoard._player1Score = 0;
-    gameBoard._player2Score = 0;
+  };
 
+  const resetGame = function () {
     if (gameBoard._isGameActive && gameBoard._currentPlayer === 'O') {
       switchPlayers();
     }
+    resettingGameState();
+
+    clearGameBoard();
+
+    if (
+      gameBoard._isGameActive &&
+      gameBoard._opponent === 'AI' &&
+      gameBoard._aiTurn
+    )
+      AISelectsTile();
 
     renderScoreBoard();
-
-    tile.forEach((tile) => {
-      tile.textContent = '';
-      tile.classList.remove('playerX');
-      tile.classList.remove('playerO');
-    });
   };
 
   /**
@@ -280,9 +299,22 @@ window.addEventListener('DOMContentLoaded', () => {
   /**********************************/
   // UI - Rendering
 
+  const clearGameBoard = function () {
+    tile.forEach((tile) => {
+      tile.textContent = '';
+      tile.classList.remove('playerX');
+      tile.classList.remove('playerO');
+    });
+  };
+
+  const renderNewBoard = function () {
+    clearGameBoard();
+  };
+
   const playWithFriend = function (e) {
     e.preventDefault();
-    resetGame();
+    gameBoard._aiTurn = false;
+    renderNewBoard();
     menu.classList.add('hide');
     game.classList.remove('hide');
     setOpponentAsFriend();
@@ -293,7 +325,13 @@ window.addEventListener('DOMContentLoaded', () => {
     resetGame();
     menu.classList.add('hide');
     game.classList.remove('hide');
-    setOpponentAsAI();
+
+    // Only render tiles if all tiles are empty (debugging the restart bug)
+    let emptyTilesRestart = [];
+    tile.forEach((tile, index) => {
+      if (tile.textContent === '') emptyTilesRestart.push(index);
+    });
+    if (emptyTilesRestart.length === 9) setOpponentAsAI();
   };
 
   const returnToMenu = function (e) {
@@ -310,7 +348,7 @@ window.addEventListener('DOMContentLoaded', () => {
       gameBoard._roundWon ||
       gameBoard._roundTie ||
       !gameBoard._isGameActive ||
-      gameBoard._aiTurn
+      gameBoard._opponent === 'AI'
     )
       return;
 
@@ -362,7 +400,7 @@ window.addEventListener('DOMContentLoaded', () => {
   };
 
   const AISelectsTile = function () {
-    if (gameBoard._aiTurn) {
+    if (gameBoard._aiTurn && gameBoard._opponent === 'AI') {
       // Prevents player from clicking
 
       // AI searching for empty tile
@@ -371,9 +409,12 @@ window.addEventListener('DOMContentLoaded', () => {
       tile.forEach((tile, index) => {
         if (tile.textContent === '') emptyTiles.push(index);
       });
+      console.log(emptyTiles);
 
       const randomEmptyTileIndex =
         emptyTiles[Math.floor(Math.random() * emptyTiles.length)];
+
+      console.log(`AI Selected: ${randomEmptyTileIndex}`);
 
       // Render AI move on board
       renderAITile(tile, randomEmptyTileIndex);
