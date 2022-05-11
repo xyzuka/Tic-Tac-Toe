@@ -27,7 +27,7 @@ window.addEventListener('DOMContentLoaded', () => {
    * Contain the state and memory storage of the game
    */
   const gameBoard = {
-    _winningScore: 2,
+    _winningScore: 3,
     _aiTurn: false,
     _opponent: '',
     _roundWon: false,
